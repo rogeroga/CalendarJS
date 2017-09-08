@@ -1,0 +1,24 @@
+/* for presentation only */
+
+.weather-wrapper {
+	margin: 0 auto;
+	background: darkslateblue;
+	float: left;
+	color: white;
+}
+
+strong {
+	color: steelblue;
+}
+
+.capitalize {
+	text-transform: capitalize;
+}
+
+.hide {
+	display: none;
+}
+
+#calendar {
+	margin: 0 auto;
+}

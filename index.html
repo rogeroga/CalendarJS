@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+	Quick prototype of a personal calendar plus current weather webapp
+	by Rogelio Robles
+-->
+
+<head>
+	<meta charset="utf-8" />
+
+	<link href="./css/jquery-ui.min.css" type="text/css" rel="stylesheet" />
+	<link href="./css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+	<link href="./css/bootstrap-theme.min.css" type="text/css" rel="stylesheet" />
+	<link href="./css/bootstrap-datetimepicker.css" type="text/css" rel="stylesheet" />
+	<link href="./css/startmin.css" type="text/css" rel="stylesheet" />
+	<link href="./css/fullcalendar.min.css" rel="stylesheet" />
+	<link href="./css/fullcalendar.print.min.css" rel="stylesheet" media="print" />
+	<link href="./css/style.css" rel="stylesheet" type="text/css" media="screen" />
+
+	<script src="./js/jquery.min.js"></script>
+	<script src="./js/jquery-ui.min.js"></script>
+	<script src="./js/moment.min.js"></script> 	
+	<script src="./js/transition.js"></script>
+	<script src="./js/collapse.js"></script>
+	<script src="./js/bootstrap.min.js"></script>	
+	<script src="./js/bootstrap-datetimepicker.min.js"></script>
+	<script src="./js/metisMenu.min.js"></script>	
+	<script src="./js/startmin.js"></script>	
+	<script src="./js/fullcalendar.min.js"></script>
+	<script src="./js/openWeather.js"></script>
+	
+</head>	
+
+<body>
+
+	<!-- Add an event  -->
+    <div class="container">	
+		<div class="modal" id="newSelectedModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Add Event</div>
+								<div class="col-md-8">
+									<a href="#" data-dismiss="modal" class="btn pull-right">Cancel</a>
+									<a href="#" class="btn btn-primary pull-right" id="newsubmitButton">Save</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Title</div><div class="col-md-8"><input id="newtitle" type="text" /></div>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Date/Time Scheduled</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<div id='datetimepicker2' class='input-group date datepicker' data-provide="datepicker">
+											<input id="newdatescheduled" type='text' class="form-control" />
+											<div class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<script type="text/javascript">
+									$(function () {
+										$('#datetimepicker2').datetimepicker({format: 'MMM/DD/YYYY hh:mm a'});
+									});
+								</script>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Duration</div><div class="col-md-8"><input id="newduration" type="text" /></div>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Status</div><div class="col-md-8">  <!-- you need to decide on your own status types and set defaults -->
+									<select id="newcboStatus">
+										<option value="statusCompleted">Completed</option>
+										<option value="statusPostponed">Postponed</option>
+										<option value="statusUndone">Undone</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- Edit an event  -->
+    <div class="container">
+		<div class="modal" id="editSelectedModal">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Edit Event</div>
+								<div class="col-md-8">
+									<a href="#" data-dismiss="modal" class="btn pull-right">Cancel</a>
+									<a href="#" class="btn btn-primary pull-right" id="submitButton">Save</a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Title</div><div class="col-md-8"><input id="title" type="text" /></div>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Date/Time Scheduled</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<div class='input-group date datepicker' id='datetimepicker1' data-provide="datepicker">
+											<input id="datescheduled" type='text' class="form-control" />
+											<div class="input-group-addon">
+												<span class="glyphicon glyphicon-calendar"></span>
+											</div>
+										</div>
+									</div>
+								</div>
+								<script type="text/javascript">
+									$(function () {
+										$('#datetimepicker1').datetimepicker({format: 'MMM/DD/YYYY hh:mm a'});
+									});
+								</script>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Duration</div><div class="col-md-8"><input id="duration" type="text" /></div>
+							</div>
+						</div>
+						<p>&nbsp;</p>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="col-md-4">Status</div><div class="col-md-8">  <!-- you need to decide on your own status types and set defaults -->
+									<select id="cboStatus">
+										<option value="statusCompleted">Completed</option>
+										<option value="statusPostponed">Postponed</option>
+										<option value="statusUndone">Undone</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+        var SelectedEvent; // the selected event object
+		var SelectedID; // the selected event ID
+		var calendar;
+		
+		
+		moment().format();
+		
+		function uniqueID() {
+			function chr4() {
+				return Math.random().toString(16).slice(-4);
+			}
+			return chr4() + '-' + chr4();
+		}
+		
+
+		function updateDashboard() {
+			var events = [];
+			events = calendar.fullCalendar('clientEvents');
+
+			var tasks = 0, undone = 0, 
+			postponed = 0, completed = 0;
+
+			events.forEach(function (event) {
+				tasks++;
+			
+				if (event.status == 'statusCompleted' ) {
+					completed++;
+				} 
+				else 
+					if (event.status == 'statusPostponed' ) {
+						postponed++;
+					} 
+					else 
+						if (event.status == 'statusUndone' ) {
+							undone++;
+						} 
+						else {
+							console.log('Weird event: ' + event.title + ' status: ' + event.status );
+						}
+            })
+
+			$('#totalTasks').html(tasks);
+			$('#totalUndone').html(undone);
+			$('#totalPostponed').html(postponed);
+			$('#totalCompleted').html(completed);
+
+		}
+
+		// Edit
+		//
+        $('#submitButton').on('click', function (e) {
+			e.preventDefault();
+			$("#editSelectedModal").modal('hide');
+
+			calendar.fullCalendar('removeEvents', SelectedEvent.id);
+			SelectedEvent = null;
+
+            var endTime = new Date( $('#datescheduled').val() );
+            endTime.setMinutes(endTime.getMinutes() + parseInt($('#duration').val()));			
+
+			var event = {
+				id: uniqueID(),
+				title: $('#title').val(),
+				start: new Date( $('#datescheduled').val() ),
+				end: endTime,
+				status: $('#cboStatus').val(),
+				duration: $('#duration').val()
+			};
+
+			calendar.fullCalendar('renderEvent', event, true);
+            calendar.fullCalendar('refresh');
+
+			updateDashboard();
+		});
+
+		// Add
+		//
+        $('#newsubmitButton').on('click', function (e) {
+            e.preventDefault();
+			$("#newSelectedModal").modal('hide');
+			
+            var endTime = new Date( $('#newdatescheduled').val() );
+            endTime.setMinutes(endTime.getMinutes() + parseInt($('#newduration').val()));
+
+            var event = {
+				id: uniqueID(),
+                title: $('#newtitle').val(),
+                start: new Date( $('#newdatescheduled').val() ),
+                end: endTime,
+				status: $('#newcboStatus').val(),
+				duration: $('#newduration').val()
+			};
+			
+			calendar.fullCalendar('renderEvent', event, true);
+			calendar.fullCalendar('refresh');
+			
+			updateDashboard();
+        });
+
+		
+		// Start		
+		$(document).ready(function() {
+
+			// Setup openWeather widget with the initial values and the location of its different UI elements 
+			//
+			$('.weather-temperature').openWeather({
+				// App Id
+				key: '307801f3850dbe53291b86eea70f2031',
+				city: 'Garden Grove,CA',
+				units: 'f',
+
+				// Elements used to display weather widget information
+				descriptionTarget: '.weather-description',
+				minTemperatureTarget: '.weather-min-temperature',
+				maxTemperatureTarget: '.weather-max-temperature',
+				placeTarget: '.weather-place',
+				iconTarget: '.weather-icon',
+				
+				// Custom icons location
+				customIcons: './img/icons/weather/',
+
+				// If the API call went fine show the weather widget
+				success: function() {
+					$('.weather-wrapper').show();
+				},
+
+				// Log error message
+				error: function(message) {
+					console.log(message);
+				}
+			});
+
+			// Setup FullCalendar widget with the initial configuration values 
+			//
+			calendar = $('#calendar').fullCalendar({
+				header: {
+					left: 'prev,next add edit delete today',
+					center: 'title',
+					right: 'month'
+				},
+				
+				theme: true,
+				firstDay: 1,		// Monday is the starting day of the Week
+				defaultDate: '2017-08-31',
+				navLinks: true, 	// Can click day/week names to navigate views
+				editable: true,		// Can change the events to another day
+				eventLimit: false, 	// Allow "more" link when too many events
+				allDaySlot: false,
+			
+				selectable: true,
+				selectHelper: true,
+
+				// Provide some initial events, these events can be sourced from a call to an API CRUD backend
+				events: [
+					{
+						id: uniqueID(),
+						title: 'Conference',
+						start: '2017-08-09T08:30:00',
+						end: '2017-08-09T09:30:00',
+						status: 'statusUndone',
+						duration: 60
+					},
+					{
+						id: uniqueID(),
+						title: 'Meeting',
+						start: '2017-08-10T10:30:00',
+						end: '2017-08-10T12:30:00',
+						status: 'statusUndone',
+						duration: 120
+					},
+					{
+						id: uniqueID(),
+						title: 'Lunch',
+						start: '2017-08-08T12:00:00',
+						end: '2017-08-08T13:30:00',
+						status: 'statusUndone',
+						duration: 90
+					},
+					{
+						id: uniqueID(),
+						title: 'Happy Hour',
+						start: '2017-08-12T15:30:00',
+						end: '2017-08-12T17:00:00',
+						status: 'statusUndone',
+						duration: 90
+					},
+					{
+						id: uniqueID(),
+						title: 'Dinner',
+						start: '2017-08-12T20:00:00',
+						end: '2017-08-12T22:00:00',
+						status: 'statusUndone',
+						duration: 120
+					},
+					{
+						id: uniqueID(),
+						title: 'Birthday Party',
+						start: '2017-08-13T19:00:00',
+						end: '2017-08-13T21:00:00',
+						status: 'statusUndone',
+						duration: 120
+					}
+
+				],
+
+                customButtons: { 
+                    add: {
+                        text: 'Add',
+                        click: function () {
+							var moment = calendar.fullCalendar('getDate');
+							$('#newSelectedModal').modal();
+							$('#newtitle').val('');
+							$('#newdatescheduled').val( moment.format('MMM/DD/YYYY hh:mm a') );
+							$('#newduration').val(30); // assuming default 30 minutes appointment
+                        }
+					},
+					
+                    delete: {
+                        text: 'Delete selected',
+                        click: function () {
+                            if (SelectedEvent != null) {
+                                alert('Delete the selected event: ' + SelectedEvent.title);
+								calendar.fullCalendar('removeEvents', SelectedEvent.id);
+								calendar.fullCalendar('refresh');
+
+								SelectedEvent = null;
+								updateDashboard();
+                            }
+                            else alert('Please select an event first!');
+                        }
+					},
+					
+                    edit: {
+                        text: 'Edit selected',
+                        click: function () {
+                            if (SelectedEvent != null) {
+								$('#editSelectedModal').modal();
+                                $('#title').val(SelectedEvent.title);
+                                $('#datescheduled').val( SelectedEvent.start.format('MMM/DD/YYYY hh:mm a') );
+                                $('#duration').val(SelectedEvent.duration);
+								$('#cboStatus').val(SelectedEvent.status);
+								
+                            }
+                            else alert('Please select an event first!');
+                        }
+					}
+				},
+				
+                eventClick: function (calEvent, jsEvent, view) {
+                    SelectedEvent = calEvent;
+					SelectedID = calEvent.id;
+					
+					console.log('event Title: ' + SelectedEvent.title + ' Id:' + SelectedID);
+                },				
+
+				// eventRender: function(event, element, view) {
+				// 	return $('<div>' + event.title + '</div>');
+				// },
+
+				// Callback functions
+				//
+				dayClick: function(date, jsEvent, view)
+				{
+					// $('#newSelectedModal').modal();
+					// $('#newtitle').val('');
+					// $('#newdatescheduled').val(  date.format('MM-DD-YYYY hh:mm a') );
+					// $('#newduration').val(30); // assuming default 30 minutes appointment
+				
+					// Code for testing purposes:
+					// alert('Clicked on: ' + date.format());
+					// Change the day's background color just for testing
+					// $(this).css('background-color', 'red')
+					// $(this).contents();
+
+					var moment = calendar.fullCalendar('getDate');
+					console.log("The current date of the calendar is " + moment.format());
+	
+					console.log( calendar.fullCalendar('clientEvents', function(event) {
+							console.log('Each event here: ' + event.title + ' status: ' + event.status );
+						}
+					)); 
+
+					updateDashboard();
+
+					// Call openWeather API and refresh test element
+					// $.getJSON("http://api.openweathermap.org/data/2.5/weather?q=Irvine&units=metric&lang=en&appid=307801f3850dbe53291b86eea70f2031", 
+					// 	function(json) {
+					// 		$('.test').html(JSON.stringify(json));
+					// 	}
+					// );
+
+				}
+
+				// select: function(start, end, jsEvent)
+				// {
+				// 	/*
+				// 		after selection user will be promted for enter title for event.
+				// 	*/
+				// 	var title = prompt('Event Title:');
+				// 	/*
+				// 		if title is enterd calendar will add title and event into fullCalendar.
+				// 	*/
+				// 	if (title)
+				// 	{
+				// 		calendar.fullCalendar('renderEvent',
+				// 			{
+				// 				title: title,
+				// 				start: start,
+				// 				end: end
+				// 			},
+				// 			true // make the event "stick"
+				// 		);
+				// 	}
+				// 	calendar.fullCalendar('unselect');
+				// }
+
+			});
+
+			updateDashboard();		
+		});
+		
+	</script>
+
+	<div class="container">
+		<div class="row">	
+			<div class="col-md-12" >
+				<div class="page-header">
+					<h1>Weather and Calendar App</h1>
+					<span>Please click on a task to select it, after that you can edit it or delete it.</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="container">
+		<div class="row">
+			<!-- Weather Widget and related elements -->
+			<div class="col-md-3" >
+				<div class="panel panel-default" >
+					<div class="panel-heading">Current Weather</div> 
+					<div class="panel-body" style="background:darkslateblue;" >
+						<div class="weather-wrapper">
+							<img src="" class="weather-icon" alt="Weather Icon" />
+							<p><strong>Place</strong>
+							<br /><span class="weather-place"></span></p>
+							<p><strong>Temperature</strong>
+							<br /><span class="weather-temperature"></span> (<span class="weather-min-temperature"></span> - <span class="weather-max-temperature"></span>)</p>
+							<p><strong>Description</strong>
+							<br /><span class="weather-description capitalize"></span></p>
+
+						</div>
+					</div>
+				</div>
+<!-- 
+				Insert Datatable
+				<div class="panel panel-default" >
+					<div class="panel-heading">Day Events</div> 
+					<div class="panel-body" style="background:darkslateblue;" >
+					</div>
+				</div>	
+-->
+			</div>
+		
+			<!-- Calendar Widget location, markup code is injected into the DOM by Widget JS -->
+			<div class="col-md-9" >		
+				<div class="panel panel-default" >
+					<div class="panel-heading">Calendar</div> 
+					<div class="panel-body" style="background: lightblue;" >
+						<div id="calendar">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">	
+
+			<div class="col-lg-3 col-md-6">
+				<div class="panel panel-green">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-3">
+								<i class="fa fa-tasks fa-5x"></i>
+							</div>
+							<div class="col-xs-9 text-right">
+								<div id="totalCompleted" class="huge"></div>
+								<div>Completed</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-3 col-md-6">
+				<div class="panel panel-yellow">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-3">
+								<i class="fa fa-shopping-cart fa-5x"></i>
+							</div>
+							<div class="col-xs-9 text-right">
+								<div id="totalPostponed" class="huge"></div>
+								<div>Postponed</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+
+			<div class="col-lg-3 col-md-6">
+				<div class="panel panel-red">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-3">
+								<i class="fa fa-support fa-5x"></i>
+							</div>
+							<div class="col-xs-9 text-right">
+								<div id="totalUndone" class="huge"></div>
+								<div>Undone</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-3 col-md-6">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<div class="row">
+							<div class="col-xs-3">
+								<i class="fa fa-comments fa-5x"></i>
+							</div>
+							<div class="col-xs-9 text-right">
+								<div id="totalTasks" class="huge"></div>
+								<div>All Tasks</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>			
+
+		</div>
+	</div>
+					
+	<!-- Footer -->
+	<div class="container">
+		<div class="row">	
+			<div class="col-md-12" >
+				<div class="navbar-fixed-bottom" >					
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+
+</html>
